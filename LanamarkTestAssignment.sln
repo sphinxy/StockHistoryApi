@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockHistory.Host", "StockHistory.Host\StockHistory.Host.csproj", "{A5860600-9BC5-4D58-936F-AD3D22FE6B84}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockHistory.Tests", "StockHistory.Tests\StockHistory.Tests.csproj", "{AC4213BC-F59E-4925-BEBB-3EB8B7F02DCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockHistory.Api.V1", "StockHistory.Api.V1\StockHistory.Api.V1.csproj", "{6EFE75E5-73F6-4F7F-A9CF-7FC925C588D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockHistory.Logic", "StockHistory.Logic\StockHistory.Logic.csproj", "{6278C1E6-5D9A-4FBA-A784-6869D359F98E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockHistory.DataAccess", "StockHistory.DataAccess\StockHistory.DataAccess.csproj", "{EEE1310C-E40C-4A95-BF27-5EACCB808AAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockHistory.Common", "StockHistory.Common\StockHistory.Common.csproj", "{E7C95683-E1F2-45D9-A9F4-464AAFFF9927}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockHistory.App", "StockHistory.App\StockHistory.App.csproj", "{719D6669-57B8-49B6-A003-6B6022483FB2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A5860600-9BC5-4D58-936F-AD3D22FE6B84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5860600-9BC5-4D58-936F-AD3D22FE6B84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5860600-9BC5-4D58-936F-AD3D22FE6B84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5860600-9BC5-4D58-936F-AD3D22FE6B84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC4213BC-F59E-4925-BEBB-3EB8B7F02DCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC4213BC-F59E-4925-BEBB-3EB8B7F02DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC4213BC-F59E-4925-BEBB-3EB8B7F02DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC4213BC-F59E-4925-BEBB-3EB8B7F02DCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EFE75E5-73F6-4F7F-A9CF-7FC925C588D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EFE75E5-73F6-4F7F-A9CF-7FC925C588D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EFE75E5-73F6-4F7F-A9CF-7FC925C588D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EFE75E5-73F6-4F7F-A9CF-7FC925C588D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6278C1E6-5D9A-4FBA-A784-6869D359F98E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6278C1E6-5D9A-4FBA-A784-6869D359F98E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6278C1E6-5D9A-4FBA-A784-6869D359F98E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6278C1E6-5D9A-4FBA-A784-6869D359F98E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEE1310C-E40C-4A95-BF27-5EACCB808AAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEE1310C-E40C-4A95-BF27-5EACCB808AAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEE1310C-E40C-4A95-BF27-5EACCB808AAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEE1310C-E40C-4A95-BF27-5EACCB808AAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7C95683-E1F2-45D9-A9F4-464AAFFF9927}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7C95683-E1F2-45D9-A9F4-464AAFFF9927}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7C95683-E1F2-45D9-A9F4-464AAFFF9927}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7C95683-E1F2-45D9-A9F4-464AAFFF9927}.Release|Any CPU.Build.0 = Release|Any CPU
+		{719D6669-57B8-49B6-A003-6B6022483FB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{719D6669-57B8-49B6-A003-6B6022483FB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{719D6669-57B8-49B6-A003-6B6022483FB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{719D6669-57B8-49B6-A003-6B6022483FB2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
