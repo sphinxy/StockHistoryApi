@@ -6,7 +6,7 @@ namespace StockHistory.Logic
 {
 	public interface IStockHistoryLogic
 	{
-		Task<Stock> GetStockById(string stockId);
-		Task<List<Stock>> GetStocks();
+		Task<Stock> GetStockById(string stockId, string clientId);
+		Task<List<Stock>> GetStocks(string clientId);
 	}
 }

@@ -11,14 +11,14 @@ namespace StockHistory.Logic
 	public class StockHistoryLogic : IStockHistoryLogic
 	{
 		private IStockHistoryDataAccess _dataAccess;
-		public async Task<Stock> GetStockById(string stockId)
+		public async Task<Stock> GetStockById(string stockId, string clientId)
 		{
-			return await _dataAccess.GetStockById(stockId);
+			return await _dataAccess.GetStockById(stockId, clientId);
 		}
 
-		public async Task<List<Stock>> GetStocks()
+		public async Task<List<Stock>> GetStocks(string clientId)
 		{
-			return await _dataAccess.GetStocks();
+			return await _dataAccess.GetStocks(clientId);
 		}
 	
 

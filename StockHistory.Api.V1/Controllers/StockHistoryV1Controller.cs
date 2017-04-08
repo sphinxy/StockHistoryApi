@@ -17,16 +17,22 @@ namespace StockHistory.Api.V1.Controllers
 		[Route("")]
 		public async Task<List<Stock>> ListStocks()
 		{
-			var stocks = await _stockHistoryLogic.GetStocks();
+			var clientId = GetAuthorizationHeader();
+			var stocks = await _stockHistoryLogic.GetStocks(clientId);
 			return stocks;
 		}
 
 		[HttpGet]
 		[Route("{stockId}")]
-		public async Task<Stock> GetStock(string stockId)
+		public async Task<IHttpActionResult> GetStock(string stockId)
 		{
-			var stock = await _stockHistoryLogic.GetStockById(stockId);
-			return stock;
+			var clientId = GetAuthorizationHeader();
+			var stock = await _stockHistoryLogic.GetStockById(stockId, clientId);
+			if (stock == null)
+			{
+				return NotFound();
+			}
+			return Ok(stock);
 		}
 		public StockHistoryV1Controller(IStockHistoryLogic stockHistoryLogic)
 		{
@@ -35,6 +41,17 @@ namespace StockHistory.Api.V1.Controllers
 				throw new ArgumentNullException();
 			}
 			_stockHistoryLogic = stockHistoryLogic;
+		}
+
+		private string GetAuthorizationHeader()
+		{
+			var headerScheme = Request.Headers?.Authorization?.Scheme;
+			var headerValue = Request.Headers?.Authorization?.Parameter;
+			if (headerScheme != null && headerScheme.Equals("Apikey", StringComparison.OrdinalIgnoreCase))
+			{
+				return headerValue;
+			}
+			return null;
 		}
 	}
 }
