@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<meta charset="utf8">
+<title>Stack History upload helper.</title>
+
+<p align="center">Stocks <input type="text" id="stockId" value="GOOL"></p>
+<p align="center">Apikey <input type="text" id="apikey" value="123456"></p>
+<div>DROP!<button onclick="document.querySelector('#file').click()">Or click</button></div>
+
+
+<input id="file" style="visibility: collapse; width: 0px;" type="file" onchange="upload(this.files[0])">
+<p><a id="result">Result will be here</a></p>
+
+<script>
+
+    window.ondragover = function(e) {e.preventDefault()}
+    window.ondrop = function(e) {e.preventDefault(); upload(e.dataTransfer.files[0]); }
+    function upload(file) {
+        var fd = new FormData(); // 
+        fd.append("data.csv", file); // Append the file
+        var xhr = new XMLHttpRequest(); 
+        xhr.open("POST", window.location.origin+"/api/v1/stocks/"+document.querySelector("#stockId").value);
+        xhr.onload = function() {
+            document.querySelector("#result").text = xhr.responseText;
+        }
+        
+        xhr.setRequestHeader('Authorization', 'ApiKey '+document.querySelector("#apikey").value); 
+        
+        xhr.send(fd);
+    }
+</script>
+
+<style>
+    body {text-align: center; padding-top: 100px;}
+    div { border: 10px solid black; text-align: center; line-height: 100px; width: 200px; margin: auto; font-size: 40px; display: inline-block;}
+    div { display: inline-block;}
+    em { position: absolute; bottom: 0; right: 0}
+</style>
+

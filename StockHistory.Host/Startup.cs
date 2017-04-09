@@ -15,8 +15,15 @@ using Swashbuckle.Application;
 
 namespace StockHistory
 {
+	/// <summary>
+	/// OWIN startup file
+	/// </summary>
 	public class Startup
 	{
+		/// <summary>
+		/// Owin configuration
+		/// </summary>
+		/// <param name="app"></param>
 		public void Configuration(IAppBuilder app)
 		{
 			var config = new HttpConfiguration();

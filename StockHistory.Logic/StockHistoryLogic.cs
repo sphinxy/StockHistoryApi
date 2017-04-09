@@ -60,7 +60,7 @@ namespace StockHistory.Logic
 					
 					if (stockDataSaveResult.Success)
 					{
-						var stockFileSaveResult = await _dataAccess.SaveStockFile(stockId, clientId, fileUploadDate, new Guid().ToString());
+						var stockFileSaveResult = await _dataAccess.SaveStockFile(stockId, clientId, fileUploadDate, Guid.NewGuid().ToString());
 						if (stockFileSaveResult)
 						{
 							return stockDataSaveResult;

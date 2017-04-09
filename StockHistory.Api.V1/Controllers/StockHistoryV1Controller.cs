@@ -54,7 +54,7 @@ namespace StockHistory.Api.V1.Controllers
 		/// <returns></returns>
 		[HttpGet]
 		[Route("{stockId}", Name = "GetStockInfo")]
-		public async Task<IHttpActionResult> GetStockInfo(string stockId, [FromUri] List<PriceType?> includePriceType)
+		public async Task<IHttpActionResult> GetStockInfo(string stockId, [FromUri] List<PriceType?> includePriceType = null)
 		{
 			var clientId = GetAuthorizationHeader();
 			if (clientId == null)
@@ -63,7 +63,7 @@ namespace StockHistory.Api.V1.Controllers
 			}
 			try
 			{
-				var stockInfo = await _stockHistoryLogic.GetStockInfoById(stockId, clientId, includePriceType.Where(p => p.HasValue).Select(p => p.Value).ToList());
+				var stockInfo = await _stockHistoryLogic.GetStockInfoById(stockId, clientId, includePriceType?.Where(p => p.HasValue).Select(p => p.Value).ToList());
 				if (stockInfo == null)
 				{
 					return NotFound();
@@ -141,10 +141,6 @@ namespace StockHistory.Api.V1.Controllers
 				return headerValue;
 			}
 			return null;
-			//comment line above just for easy development
-			//var temporaryClientId = "123";
-			//return temporaryClientId;
-			
 		}
 	}
 }
