@@ -47,7 +47,7 @@ namespace StockHistory.Api.V1.Controllers
 		}
 
 		/// <summary>
-		/// query individual stock symbol for the following stats: min, avg, max, median, 95th percentile for each price type (OHLC)
+		/// Query individual stock symbol for the following stats: min, avg, max, median, 95th percentile for each price type (OHLC)
 		/// </summary>
 		/// <param name="stockId">Stock Id</param>
 		/// <param name="includePriceType">One or more stats to include</param>

@@ -132,6 +132,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="TestData\amznCorrect252.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="TestData\googCorrect252.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

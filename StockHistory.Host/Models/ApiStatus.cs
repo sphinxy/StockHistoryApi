@@ -16,9 +16,9 @@ namespace StockHistory.Models
 		public string Name { get;}
 
 		/// <summary>
-		/// Just a note to user about default endpoint
+		/// Hint for user
 		/// </summary>
-		public string DefaultEndpoint { get; }
+		public string Hint { get; }
 
 		/// <summary>
 		/// Status information about API
@@ -26,7 +26,7 @@ namespace StockHistory.Models
 		public ApiStatus()
 		{
 			Name = "StockHistory Api";
-			DefaultEndpoint = "api/v1/stocks";
+			Hint = "Use /swagger and /uploader";
 		}
 	}
 }

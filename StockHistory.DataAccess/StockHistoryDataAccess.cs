@@ -18,7 +18,7 @@ namespace StockHistory.DataAccess
 {
 	public class StockHistoryDataAccess : IStockHistoryDataAccess
 	{
-		private string dbName = "StockHistoryTest";
+		private string _dbName;
 		private const string StockMeasure = "stock";
 		private const string FileMeasure = "stockFile";
 		private const string ClientIdTag = "clientId";
@@ -26,6 +26,13 @@ namespace StockHistory.DataAccess
 
 		private readonly InfluxDbClient _influxDbClient;
 
+		/// <summary>
+		/// Query InfluxDB for info and stats about particular stock
+		/// </summary>
+		/// <param name="stockId"></param>
+		/// <param name="clientId"></param>
+		/// <param name="includePriceType"></param>
+		/// <returns></returns>
 		public async Task<StockInfo> GetStockInfoById(string stockId, string clientId, List<PriceType> includePriceType)
 		{
 			var recentDataPointTime = await GetMostRecentDataPoint(stockId, clientId);
@@ -36,7 +43,7 @@ namespace StockHistory.DataAccess
 				//we need at least one field in query, count(volume) for it
 				var query =
 					$"SELECT COUNT(volume) {priceTypeAggrerationsQuery} FROM {StockMeasure} WHERE {ClientIdTag}='{clientId}' and {StockIdTag}='{stockId}'";
-				var response = await _influxDbClient.Client.QueryAsync(dbName, query);
+				var response = await _influxDbClient.Client.QueryAsync(_dbName, query);
 				var stats = response.Count() == 1 ? response.FirstOrDefault() : null;
 
 				var stockInfo = new StockInfo
@@ -61,7 +68,6 @@ namespace StockHistory.DataAccess
 						};
 						stockInfo.Stats.Add(priceTypeStat);
 					}
-					
 				}
 
 				return stockInfo;
@@ -70,6 +76,13 @@ namespace StockHistory.DataAccess
 			return null;
 		}
 
+		/// <summary>
+		/// We use column names like 'openMIN' and parse stat value from string
+		/// </summary>
+		/// <param name="stats"></param>
+		/// <param name="priceType"></param>
+		/// <param name="statAggregate"></param>
+		/// <returns></returns>
 		private static double? ParseStatValue(Serie stats, PriceType priceType, StatAggregate statAggregate)
 		{
 			var priceTypeColumn = priceType.ToString().ToLower();
@@ -77,6 +90,11 @@ namespace StockHistory.DataAccess
 			return ParseHelper.ParseDouble(statValue);
 		}
 
+		/// <summary>
+		/// Helper to build query part like ' , MIN(open) as openMIN '
+		/// </summary>
+		/// <param name="includePriceTypes"></param>
+		/// <returns></returns>
 		private static string BuildPriceTypeAggrerations(List<PriceType> includePriceTypes)
 		{
 			var aggregates = new []
@@ -100,11 +118,16 @@ namespace StockHistory.DataAccess
 			var priceTypeAggrerationsQuery = sb.ToString();
 			return priceTypeAggrerationsQuery;
 		}
-
+		/// <summary>
+		/// Query stock information for last data point
+		/// </summary>
+		/// <param name="stockId"></param>
+		/// <param name="clientId"></param>
+		/// <returns></returns>
 		public async Task<DateTime?> GetMostRecentDataPoint(string stockId, string clientId)
 		{
 			var query = $"select * from {StockMeasure} where clientId='{clientId}'  and stockId='{stockId}' order by time desc limit 1";
-			var response = await _influxDbClient.Client.QueryAsync(dbName, query);
+			var response = await _influxDbClient.Client.QueryAsync(_dbName, query);
 			foreach (var recentPoint in response)
 			{
 				if (recentPoint.Values.Count == 1)
@@ -116,12 +139,16 @@ namespace StockHistory.DataAccess
 		}
 
 
-
+		/// <summary>
+		/// Query information about stocks for particular client
+		/// </summary>
+		/// <param name="clientId"></param>
+		/// <returns></returns>
 		public async Task<List<Stock>> GetStocks(string clientId)
 		{
 			var stocks = new List<Stock>();
 			var query = $"select fileId from {FileMeasure} where {ClientIdTag}='{clientId}' group by {StockIdTag} order by time desc limit 1";
-			var response = await _influxDbClient.Client.QueryAsync(dbName, query);
+			var response = await _influxDbClient.Client.QueryAsync(_dbName, query);
 			foreach (var stock in response)
 			{
 				if (stock.Values.Count == 1)
@@ -139,6 +166,13 @@ namespace StockHistory.DataAccess
 			return stocks;
 		}
 
+		/// <summary>
+		/// Saves stock data in database
+		/// </summary>
+		/// <param name="stockId"></param>
+		/// <param name="clientId"></param>
+		/// <param name="stockDataPoints"></param>
+		/// <returns></returns>
 		public async Task<StockUploadResult> SaveStockData(string stockId, string clientId, List<StockDataPoint> stockDataPoints)
 		{
 			var points = new List<Point>();
@@ -167,7 +201,7 @@ namespace StockHistory.DataAccess
 					};
 					points.Add(pointToWrite);
 				}
-				var result = await _influxDbClient.Client.WriteAsync(dbName, points);
+				var result = await _influxDbClient.Client.WriteAsync(_dbName, points);
 				return new StockUploadResult { Success = result.Success };
 			}
 			catch (Exception)
@@ -176,6 +210,14 @@ namespace StockHistory.DataAccess
 			}
 		}
 
+		/// <summary>
+		///  Saves information about file upload in database
+		/// </summary>
+		/// <param name="stockId"></param>
+		/// <param name="clientId"></param>
+		/// <param name="fileUploadDate"></param>
+		/// <param name="fileId"></param>
+		/// <returns></returns>
 		public async Task<bool> SaveStockFile(string stockId, string clientId, DateTime fileUploadDate, string fileId)
 		{
 			var filePointToWrite = new Point()
@@ -192,12 +234,13 @@ namespace StockHistory.DataAccess
 						},
 				Timestamp = fileUploadDate
 			};
-			var result = await _influxDbClient.Client.WriteAsync(dbName, filePointToWrite);
+			var result = await _influxDbClient.Client.WriteAsync(_dbName, filePointToWrite);
 			return result.Success;
 		}
 
 		public StockHistoryDataAccess()
 		{
+			_dbName = CloudConfigurationManager.GetSetting("StockHistory.Database.Name");
 			_influxDbClient = new InfluxDbClient(CloudConfigurationManager.GetSetting("StockHistory.Database.Uri"), CloudConfigurationManager.GetSetting("StockHistory.Database.User"), CloudConfigurationManager.GetSetting("StockHistory.Database.Password"), InfluxDbVersion.Latest);
 		}
 	}

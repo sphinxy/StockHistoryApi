@@ -14,6 +14,14 @@ namespace StockHistory.Logic
 	public class StockHistoryLogic : IStockHistoryLogic
 	{
 		private IStockHistoryDataAccess _dataAccess;
+
+		/// <summary>
+		/// Get stock information and statistics
+		/// </summary>
+		/// <param name="stockId"></param>
+		/// <param name="clientId"></param>
+		/// <param name="includePriceType"></param>
+		/// <returns></returns>
 		public async Task<StockInfo> GetStockInfoById(string stockId, string clientId, List<PriceType> includePriceType)
 		{
 			if (string.IsNullOrEmpty(stockId))
@@ -27,6 +35,11 @@ namespace StockHistory.Logic
 			return await _dataAccess.GetStockInfoById(stockId, clientId, includePriceType);
 		}
 
+		/// <summary>
+		/// Get information about stocks for particular client
+		/// </summary>
+		/// <param name="clientId"></param>
+		/// <returns></returns>
 		public async Task<List<Stock>> GetStocks(string clientId)
 		{
 			if (string.IsNullOrEmpty(clientId))
@@ -36,6 +49,14 @@ namespace StockHistory.Logic
 			return await _dataAccess.GetStocks(clientId);
 		}
 
+
+		/// <summary>
+		/// Saves stock data in database, also saves information about file upload
+		/// </summary>
+		/// <param name="stockId"></param>
+		/// <param name="clientId"></param>
+		/// <param name="data"></param>
+		/// <returns></returns>
 		public async Task<StockUploadResult> SaveStockData(string stockId, string clientId, Stream data)
 		{
 			var fileUploadDate = DateTime.UtcNow;
@@ -78,6 +99,12 @@ namespace StockHistory.Logic
 			}
 		}
 
+		/// <summary>
+		/// Parse line like 7-Apr-17,899.65,900.09,889.31,894.88,3710922 mapped as Date,Open,High,Low,Close,Volume
+		/// </summary>
+		/// <param name="reader"></param>
+		/// <param name="stockDataPoints"></param>
+		/// <returns></returns>
 		private Tuple<bool, string> ParseDataPoint(StreamReader reader, List<StockDataPoint> stockDataPoints)
 		{
 			while (!reader.EndOfStream)
@@ -105,6 +132,11 @@ namespace StockHistory.Logic
 			return new Tuple<bool, string>(true, null);
 		}
 
+		/// <summary>
+		///  First header line in CVS should be exactly as expected
+		/// </summary>
+		/// <param name="reader"></param>
+		/// <returns></returns>
 		private bool CheckFileHeader(StreamReader reader)
 		{
 			if (!reader.EndOfStream)

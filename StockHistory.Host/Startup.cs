@@ -70,7 +70,7 @@ namespace StockHistory
 			// Enable middleware to serve generated Swagger as a JSON endpoint.
 			config.EnableSwagger(c =>
 			{
-				c.SingleApiVersion("v1", "StockHistory Api V1").Description("Stock history information. Use for example 'ApiKey 123456' as apikey");
+				c.SingleApiVersion("v1", "StockHistory Api V1").Description("Stock history information. Use for example 'ApiKey 123456' as apikey. Any number is valid and represent separate client.");
 				c.IncludeXmlComments($@"{AppDomain.CurrentDomain.BaseDirectory}\bin\StockHistory.XML");
 				c.IncludeXmlComments($@"{AppDomain.CurrentDomain.BaseDirectory}\bin\StockHistory.Api.V1.xml");
 				c.DescribeAllEnumsAsStrings();
