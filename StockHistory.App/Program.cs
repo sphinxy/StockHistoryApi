@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin.Hosting;
 using System.Configuration;
+using Microsoft.Azure;
 
 namespace StockHistory.App
 {
@@ -13,7 +14,7 @@ namespace StockHistory.App
 	{
 		static void Main(string[] args)
 		{
-			string baseAddress = ConfigurationManager.AppSettings["StockHistory.Uri"];
+			string baseAddress = CloudConfigurationManager.GetSetting("StockHistory.Uri");
 
 			// Start OWIN host 
 			using (WebApp.Start<Startup>(url: baseAddress))

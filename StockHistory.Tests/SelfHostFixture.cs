@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Azure;
 using Microsoft.Owin.Hosting;
 
 namespace StockHistory.Tests
@@ -19,7 +20,7 @@ namespace StockHistory.Tests
 
 		protected virtual void OnInit()
 		{
-			WebApiService = WebApp.Start<T>(new StartOptions(ConfigurationManager.AppSettings["StockHistory.Uri"]));
+			WebApiService = WebApp.Start<T>(new StartOptions(CloudConfigurationManager.GetSetting("StockHistory.Uri")));
 		}
 
 		public virtual void Dispose()

@@ -6,9 +6,12 @@ using Xunit;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.Azure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using StockHistory.Common.Enums;
 using StockHistory.Common.Models;
+using StockHistory.Tests.Mocks;
 
 namespace StockHistory.Tests
 {
@@ -17,17 +20,53 @@ namespace StockHistory.Tests
 	{
 		private HttpClient client;
 		private const string TestStockId = "GOOL";
-		private const string ValidClientId = "123";
 		private const string WrongClientId = "000";
 
 		[Fact]
 		public async void GetStockById()
 		{
-			var response = await client.SendAsync(GetRequestWithAuthorization(TestStockId, ValidClientId));
+			var response = await client.SendAsync(GetRequestWithAuthorization(TestStockId, TestStockHistoryDataAccess.ValidClientId));
 			Assert.True(response.IsSuccessStatusCode, $"{response.StatusCode}");
-			var stock = JsonConvert.DeserializeObject<Stock>(await response.Content.ReadAsStringAsync());
-			Assert.NotNull(stock);
-			Assert.Equal(TestStockId, stock.StockId);
+			var stockData = JsonConvert.DeserializeObject<StockData>(await response.Content.ReadAsStringAsync());
+			Assert.NotNull(stockData);
+			Assert.Equal(TestStockId, stockData.StockId);
+			Assert.Empty(stockData.Stats);
+		}
+
+		[Fact]
+		public async void GetStockByIdIncludeHigh()
+		{
+			var response = await client.SendAsync(GetRequestWithAuthorization(TestStockId+ "?IncludePriceType=High", TestStockHistoryDataAccess.ValidClientId));
+			Assert.True(response.IsSuccessStatusCode, $"{response.StatusCode}");
+			var stockData = JsonConvert.DeserializeObject<StockData>(await response.Content.ReadAsStringAsync());
+			Assert.NotNull(stockData);
+			Assert.Equal(TestStockId, stockData.StockId);
+			Assert.NotEmpty(stockData.Stats);
+			Assert.NotEmpty(stockData.Stats);
+			Assert.Equal(1, stockData.Stats.Count);
+			Assert.Equal(PriceType.High, stockData.Stats[0].StatName);
+			Assert.Equal(TestStockHistoryDataAccess.HighMin, stockData.Stats[0].Min);
+			Assert.Equal(TestStockHistoryDataAccess.HighMax, stockData.Stats[0].Max);
+		}
+
+		[Fact]
+		public async void GetStockByIdIncludeHighAndOpen()
+		{
+			var response = await client.SendAsync(GetRequestWithAuthorization(TestStockId + "?IncludePriceType=High&IncludePriceType=Open", TestStockHistoryDataAccess.ValidClientId));
+			Assert.True(response.IsSuccessStatusCode, $"{response.StatusCode}");
+			var stockData = JsonConvert.DeserializeObject<StockData>(await response.Content.ReadAsStringAsync());
+			Assert.NotNull(stockData);
+			Assert.Equal(TestStockId, stockData.StockId);
+			Assert.NotEmpty(stockData.Stats);
+			Assert.NotEmpty(stockData.Stats);
+			Assert.Equal(2, stockData.Stats.Count);
+			//response order not guaranteed
+			Assert.Equal(PriceType.High, stockData.Stats[0].StatName);
+			Assert.Equal(TestStockHistoryDataAccess.HighMin, stockData.Stats[0].Min);
+			Assert.Equal(TestStockHistoryDataAccess.HighMax, stockData.Stats[0].Max);
+			Assert.Equal(PriceType.Open, stockData.Stats[1].StatName);
+			Assert.Equal(TestStockHistoryDataAccess.OpenMin, stockData.Stats[1].Min);
+			Assert.Equal(TestStockHistoryDataAccess.OpenMax, stockData.Stats[1].Max);
 		}
 
 		[Fact]
@@ -41,7 +80,7 @@ namespace StockHistory.Tests
 		public async void GetStocks()
 		{
 			
-			var response = await client.SendAsync(GetRequestWithAuthorization("", ValidClientId));
+			var response = await client.SendAsync(GetRequestWithAuthorization("", TestStockHistoryDataAccess.ValidClientId));
 			Assert.True(response.IsSuccessStatusCode, $"{response.StatusCode}");
 			var stocks = JsonConvert.DeserializeObject<List<Stock>>(await response.Content.ReadAsStringAsync());
 			Assert.NotNull(stocks);
@@ -81,7 +120,7 @@ namespace StockHistory.Tests
 		{
 			client = new HttpClient
 			{
-				BaseAddress = new Uri($"{ConfigurationManager.AppSettings["StockHistory.Uri"]}api/v1/stocks/"),
+				BaseAddress = new Uri($"{CloudConfigurationManager.GetSetting("StockHistory.Uri")}api/v1/stocks/"),
 				};
 		}
 	}

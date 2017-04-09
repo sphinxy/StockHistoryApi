@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using StockHistory.Common.Models;
+using StockHistory.Common.Enums;
 
 namespace StockHistory.DataAccess
 {
 	public interface IStockHistoryDataAccess
 	{
-		Task<Stock> GetStockById(string stockId, string clientId);
+		Task<StockData> GetStockDataById(string stockId, string clientId, List<PriceType> includePriceTypes);
 		Task<List<Stock>> GetStocks(string clientId);
 	}
 }

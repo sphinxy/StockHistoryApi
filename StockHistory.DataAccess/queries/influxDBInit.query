@@ -1,0 +1,24 @@
+CREATE DATABASE "StockHistoryTest"
+##########
+### fill some StockHistory files
+##########
+# check with select * from stockFile
+
+#2017/01/01
+stockFile,clientId=123,stockId=GOOL fileId="a320baa5-055e-4c20-ab8c-afd95b2950d7" 1483228800000000000 
+stockFile,clientId=123,stockId=AMZN fileId="a320baa5-055e-4c20-ab8c-afd95b2950d7" 1483228800000000000 
+
+#2016/02/01
+stockFile,clientId=123,stockId=GOOL fileId="dbb4bbc7-e3a4-487d-bb3c-4017755e9889" 1485907200000000000
+stockFile,clientId=123,stockId=AMZN fileId="a320baa5-055e-4c20-ab8c-afd95b2950d7" 1485907200000000000
+##########
+### fill some Stock data
+##########
+#31-Mar-17,828.97,831.64,827.39,829.56,1401893
+stock,clientId=123,stockId=GOOL open=828.97,high=831.64,low=827.39,close=829.56,volume=1401893 1490918400000000000
+
+#30-Mar-17,833.50,833.68,829.00,831.50,1055339
+stock,clientId=123,stockId=GOOL open=833.50,high=833.68,low=829.00,close=831.50,volume=1055339 1490832000000000000
+
+#29-Mar-17,825.00,832.76,822.38,831.41,1786321
+stock,clientId=123,stockId=GOOL open=825.00,high=832.76,low=822.38,close=831.41,volume=1786321 1490745600000000000

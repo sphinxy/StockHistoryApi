@@ -30,7 +30,9 @@ namespace StockHistory
 					StringComparison.InvariantCultureIgnoreCase,
 					true,
 					"application/json"));
-
+			config.Formatters.JsonFormatter.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
+			config.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+			
 			var builder = new ContainerBuilder();
 			var assemblies = (from file in Directory.GetFiles(GetAppBaseDirectory())
 								where (
