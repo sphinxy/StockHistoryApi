@@ -58,21 +58,23 @@ namespace StockHistory
 			// Autofac-injected middleware registered with the container.
 			app.UseAutofacMiddleware(container);
 			app.UseAutofacWebApi(config);
-
+			
 			SetupSwagger(config);
 
+			//temporary enable all errors show
+			config.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
 
 			app.UseWebApi(config);
 		}
-
+			
 		private static void SetupSwagger(HttpConfiguration config)
 		{
 			// Enable middleware to serve generated Swagger as a JSON endpoint.
 			config.EnableSwagger(c =>
 			{
 				c.SingleApiVersion("v1", "StockHistory Api V1").Description("Stock history information. Use for example 'ApiKey 123456' as apikey. Any number is valid and represent separate client.");
-				c.IncludeXmlComments($@"{AppDomain.CurrentDomain.BaseDirectory}\bin\StockHistory.XML");
-				c.IncludeXmlComments($@"{AppDomain.CurrentDomain.BaseDirectory}\bin\StockHistory.Api.V1.xml");
+				c.IncludeXmlComments($@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\StockHistory.XML");
+				c.IncludeXmlComments($@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\StockHistory.Api.V1.XML");
 				c.DescribeAllEnumsAsStrings();
 				c.ApiKey("apiKey").Description("API Key Authentication").Name("Authorization").In("header");
 			}).EnableSwaggerUi(c => { c.EnableApiKeySupport("Authorization", "header"); });

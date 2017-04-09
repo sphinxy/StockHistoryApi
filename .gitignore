@@ -240,3 +240,9 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+#xml docs
+App_Data
+
+#publish profiles
+PublishProfiles
