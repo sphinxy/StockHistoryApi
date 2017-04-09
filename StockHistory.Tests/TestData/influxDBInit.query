@@ -1,3 +1,4 @@
+# DDL
 #DROP DATABASE "StockHistoryTest"
 #CREATE DATABASE "StockHistoryTest"
 ##########
@@ -5,14 +6,17 @@
 ##########
 # check with select * from stockFile
 
+# DML
+# CONTEXT-DATABASE: StockHistoryTest
+
 #2017/01/01 111
 stockFile,clientId=111,stockId=GOOL fileId="a320baa5-055e-4c20-ab8c-afd95b2950d7" 1483228800000000000 
-stockFile,clientId=111,stockId=AMZN fileId="a320baa5-055e-4c20-ab8c-afd95b2950d7" 1483228800000000000 
+stockFile,clientId=111,stockId=AMZN fileId="4fa6835a-f345-49dc-b488-8745acb8d2ee" 1483228800000000000 
 
 #2016/02/01 111
 stockFile,clientId=111,stockId=GOOL fileId="dbb4bbc7-e3a4-487d-bb3c-4017755e9889" 1485907200000000000
 #2016/02/01 222
-stockFile,clientId=222,stockId=AMZN fileId="a320baa5-055e-4c20-ab8c-afd95b2950d7" 1485907200000000000
+stockFile,clientId=222,stockId=AMZN fileId="29c6b4d9-e001-4373-8248-d4c29dec6775" 1485907200000000000
 ##########
 ### fill some Stock data
 ##########
