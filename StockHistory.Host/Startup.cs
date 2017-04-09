@@ -11,6 +11,7 @@ using Autofac;
 using Autofac.Integration.WebApi;
 using Owin;
 using StockHistory.Logic;
+using Swashbuckle.Application;
 
 namespace StockHistory
 {
@@ -51,8 +52,25 @@ namespace StockHistory
 			app.UseAutofacMiddleware(container);
 			app.UseAutofacWebApi(config);
 
+			SetupSwagger(config);
+
+
 			app.UseWebApi(config);
 		}
+
+		private static void SetupSwagger(HttpConfiguration config)
+		{
+			// Enable middleware to serve generated Swagger as a JSON endpoint.
+			config.EnableSwagger(c =>
+			{
+				c.SingleApiVersion("v1", "StockHistory Api V1").Description("Stock history information. Use for example 'ApiKey 123456' as apikey");
+				c.IncludeXmlComments($@"{AppDomain.CurrentDomain.BaseDirectory}\bin\StockHistory.XML");
+				c.IncludeXmlComments($@"{AppDomain.CurrentDomain.BaseDirectory}\bin\StockHistory.Api.V1.xml");
+				c.DescribeAllEnumsAsStrings();
+				c.ApiKey("apiKey").Description("API Key Authentication").Name("Authorization").In("header");
+			}).EnableSwaggerUi(c => { c.EnableApiKeySupport("Authorization", "header"); });
+		}
+
 		private static string GetAppBaseDirectory()
 		{
 			var domain = AppDomain.CurrentDomain;

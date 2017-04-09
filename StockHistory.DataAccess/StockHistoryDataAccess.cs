@@ -7,9 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using InfluxData.Net.Common.Enums;
 using InfluxData.Net.InfluxDb;
+using InfluxData.Net.InfluxDb.Models;
 using InfluxData.Net.InfluxDb.Models.Responses;
 using Microsoft.Azure;
 using StockHistory.Common.Enums;
+using StockHistory.Common.Helpers;
 using StockHistory.Common.Models;
 
 namespace StockHistory.DataAccess
@@ -17,26 +19,27 @@ namespace StockHistory.DataAccess
 	public class StockHistoryDataAccess : IStockHistoryDataAccess
 	{
 		private string dbName = "StockHistoryTest";
-		private string stockMeasure = "stock";
-		private string fileMeasure = "stockFile";
+		private const string StockMeasure = "stock";
+		private const string FileMeasure = "stockFile";
+		private const string ClientIdTag = "clientId";
+		private const string StockIdTag = "stockId";
 
-		private readonly InfluxDbClient influxDbClient;
+		private readonly InfluxDbClient _influxDbClient;
 
-		public async Task<StockData> GetStockDataById(string stockId, string clientId, List<PriceType> includePriceTypes)
+		public async Task<StockInfo> GetStockInfoById(string stockId, string clientId, List<PriceType> includePriceType)
 		{
-
 			var recentDataPointTime = await GetMostRecentDataPoint(stockId, clientId);
 			if (recentDataPointTime != null)
 			{
-				var priceTypeAggrerationsQuery = BuildPriceTypeAggrerations(includePriceTypes);
+				var priceTypeAggrerationsQuery = BuildPriceTypeAggrerations(includePriceType);
 
 				//we need at least one field in query, count(volume) for it
 				var query =
-					$"SELECT COUNT(volume) {priceTypeAggrerationsQuery} FROM {stockMeasure} WHERE clientId='{clientId}' and stockId='{stockId}'";
-				var response = await influxDbClient.Client.QueryAsync(dbName, query);
+					$"SELECT COUNT(volume) {priceTypeAggrerationsQuery} FROM {StockMeasure} WHERE {ClientIdTag}='{clientId}' and {StockIdTag}='{stockId}'";
+				var response = await _influxDbClient.Client.QueryAsync(dbName, query);
 				var stats = response.Count() == 1 ? response.FirstOrDefault() : null;
 
-				var stockData = new StockData
+				var stockInfo = new StockInfo
 				{
 					StockId = stockId,
 					RecentDataPointTime = recentDataPointTime,
@@ -44,7 +47,7 @@ namespace StockHistory.DataAccess
 				};
 				if (stats != null && stats.Values.Count() == 1)
 				{
-					foreach (var priceType in includePriceTypes)
+					foreach (var priceType in includePriceType)
 					{
 
 						var priceTypeStat = new PriceTypeStat
@@ -56,12 +59,12 @@ namespace StockHistory.DataAccess
 							Median = ParseStatValue(stats, priceType, StatAggregate.Median),
 							Percentile95 = ParseStatValue(stats, priceType, StatAggregate.Percentile),
 						};
-						stockData.Stats.Add(priceTypeStat);
+						stockInfo.Stats.Add(priceTypeStat);
 					}
 					
 				}
 
-				return stockData;
+				return stockInfo;
 			}
 
 			return null;
@@ -71,12 +74,7 @@ namespace StockHistory.DataAccess
 		{
 			var priceTypeColumn = priceType.ToString().ToLower();
 			var statValue = stats.Values[0][stats.Columns.IndexOf(priceTypeColumn + statAggregate)].ToString().Replace(',', '.');
-			double result;
-			if (double.TryParse(statValue, NumberStyles.Any, CultureInfo.InvariantCulture, out result))
-			{
-				return result;
-			}
-			return null;
+			return ParseHelper.ParseDouble(statValue);
 		}
 
 		private static string BuildPriceTypeAggrerations(List<PriceType> includePriceTypes)
@@ -105,8 +103,8 @@ namespace StockHistory.DataAccess
 
 		public async Task<DateTime?> GetMostRecentDataPoint(string stockId, string clientId)
 		{
-			var query = $"select * from {stockMeasure} where clientId='{clientId}'  and stockId='{stockId}' order by time desc limit 1";
-			var response = await influxDbClient.Client.QueryAsync(dbName, query);
+			var query = $"select * from {StockMeasure} where clientId='{clientId}'  and stockId='{stockId}' order by time desc limit 1";
+			var response = await _influxDbClient.Client.QueryAsync(dbName, query);
 			foreach (var recentPoint in response)
 			{
 				if (recentPoint.Values.Count == 1)
@@ -122,8 +120,8 @@ namespace StockHistory.DataAccess
 		public async Task<List<Stock>> GetStocks(string clientId)
 		{
 			var stocks = new List<Stock>();
-			var query = $"select fileId from {fileMeasure} where clientId='{clientId}' group by stockId order by time desc limit 1";
-			var response = await influxDbClient.Client.QueryAsync(dbName, query);
+			var query = $"select fileId from {FileMeasure} where {ClientIdTag}='{clientId}' group by {StockIdTag} order by time desc limit 1";
+			var response = await _influxDbClient.Client.QueryAsync(dbName, query);
 			foreach (var stock in response)
 			{
 				if (stock.Values.Count == 1)
@@ -141,9 +139,66 @@ namespace StockHistory.DataAccess
 			return stocks;
 		}
 
+		public async Task<StockUploadResult> SaveStockData(string stockId, string clientId, List<StockDataPoint> stockDataPoints)
+		{
+			var points = new List<Point>();
+			try
+			{
+				foreach (var stockDataPoint in stockDataPoints)
+				{
+					var pointToWrite = new Point()
+					{
+						Name = StockMeasure,
+						Tags = new Dictionary<string, object>()
+						{
+							{ClientIdTag, clientId},
+							{StockIdTag, stockId}
+						},
+						Fields = new Dictionary<string, object>()
+						{
+							{"open", stockDataPoint.Open},
+							{"high", stockDataPoint.High},
+							{"low", stockDataPoint.Low},
+							{"close", stockDataPoint.Close},
+							{"volume", stockDataPoint.Volume},
+
+						},
+						Timestamp = stockDataPoint.Date
+					};
+					points.Add(pointToWrite);
+				}
+				var result = await _influxDbClient.Client.WriteAsync(dbName, points);
+				return new StockUploadResult { Success = result.Success };
+			}
+			catch (Exception)
+			{
+				return new StockUploadResult {Success = false, Error = $"Saving in db failed"};
+			}
+		}
+
+		public async Task<bool> SaveStockFile(string stockId, string clientId, DateTime fileUploadDate, string fileId)
+		{
+			var filePointToWrite = new Point()
+			{
+				Name = FileMeasure,
+				Tags = new Dictionary<string, object>()
+						{
+							{ClientIdTag, clientId},
+							{StockIdTag, stockId}
+						},
+				Fields = new Dictionary<string, object>()
+						{
+							{"fileId", fileId}
+						},
+				Timestamp = fileUploadDate
+			};
+			var result = await _influxDbClient.Client.WriteAsync(dbName, filePointToWrite);
+			return result.Success;
+		}
+
 		public StockHistoryDataAccess()
 		{
-			influxDbClient = new InfluxDbClient(CloudConfigurationManager.GetSetting("StockHistory.Database.Uri"), CloudConfigurationManager.GetSetting("StockHistory.Database.User"), CloudConfigurationManager.GetSetting("StockHistory.Database.Password"), InfluxDbVersion.Latest);
+			_influxDbClient = new InfluxDbClient(CloudConfigurationManager.GetSetting("StockHistory.Database.Uri"), CloudConfigurationManager.GetSetting("StockHistory.Database.User"), CloudConfigurationManager.GetSetting("StockHistory.Database.Password"), InfluxDbVersion.Latest);
 		}
 	}
 }

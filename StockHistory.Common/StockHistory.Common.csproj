@@ -67,9 +67,12 @@
   <ItemGroup>
     <Compile Include="Enums\StatAggregate.cs" />
     <Compile Include="Enums\PriceType.cs" />
+    <Compile Include="Helpers\ParseHelper.cs" />
     <Compile Include="Models\PriceTypeStat.cs" />
-    <Compile Include="Models\StockData.cs" />
+    <Compile Include="Models\StockDataPoint.cs" />
+    <Compile Include="Models\StockInfo.cs" />
     <Compile Include="Models\Stock.cs" />
+    <Compile Include="Models\StockUploadResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -13,6 +13,10 @@ namespace StockHistory.Controllers
 	public class DefaultController : ApiController
 	{
 
+		/// <summary>
+		/// Status of API
+		/// </summary>
+		/// <returns></returns>
 		[HttpGet]
 		[Route("")]
 		public ApiStatus ApiStatus()
