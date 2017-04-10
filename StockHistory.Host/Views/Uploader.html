@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf8">
 <title>Stack History upload helper.</title>
+<p> Simple uploader to test POST endpoint.
 
 <p align="center">Stocks <input type="text" id="stockId" value="GOOL"></p>
 <p align="center">Apikey <input type="text" id="apikey" value="123456"></p>
@@ -15,12 +16,16 @@
     window.ondragover = function(e) {e.preventDefault()}
     window.ondrop = function(e) {e.preventDefault(); upload(e.dataTransfer.files[0]); }
     function upload(file) {
+        document.querySelector("#result").text = "Uploading";
         var fd = new FormData(); // 
         fd.append("data.csv", file); // Append the file
         var xhr = new XMLHttpRequest(); 
         xhr.open("POST", window.location.origin+"/api/v1/stocks/"+document.querySelector("#stockId").value);
         xhr.onload = function() {
-            document.querySelector("#result").text = xhr.responseText;
+            document.querySelector("#result").text = xhr.responseText + ' at ' + new Date().toLocaleTimeString();
+        }
+        xhr.onerror = function(e ) {
+            document.querySelector("#result").text = "Error " + e.target.status + ' at '+ new Date().toLocaleTimeString();
         }
         
         xhr.setRequestHeader('Authorization', 'ApiKey '+document.querySelector("#apikey").value); 
